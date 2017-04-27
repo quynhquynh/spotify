@@ -1,0 +1,146 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  
+    <title>Spotify</title>
+
+  
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+   
+    <link href="css/happy.css" rel="stylesheet">
+
+   
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Dancing+Script' rel='stylesheet' type='text/css'>
+
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script> 
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('#searchBtn').click(function(e){
+
+        var searchField = $('#keyword');
+        var submitButton = $('#searchBtn');
+        //disable btn while searching
+        searchField.prop("disabled", true);
+        submitButton.attr("disabled", true).val("searching...");
+        //the AJAX
+        var spotifyAPI = "https://api.spotify.com/v1/search";
+        //get value of the input field
+        var query = searchField.val();
+        //condition to search
+        var spotifyOptions = {
+            q: query,
+            type: 'album'
+        }
+ 
+        //success, parsing data
+        function displayAlbums(data){
+            var artistName = $('#keyword').val();
+
+            $('#artistName').text(artistName);
+            //create albumHTML
+            var albumHTML = '<ul>';
+            $.each(data.albums.items, function(i, eachAlbum){
+
+                albumHTML += '<li class="col-md-4 list"> ';
+                //get img of Albums
+                albumHTML += '<img src="'+eachAlbum.images[0].url+'"width="200" height="200" class="album">';
+                //get album name
+                var title = eachAlbum.name;
+                if (title.length>20){
+                    title = title.substring(0, 20)+'...';
+                } else title;
+              
+                albumHTML += '<p class="caption">'+title+
+                '</p>';
+                //get available market
+                var available = eachAlbum.available_markets;
+                if (available.length>8){
+                    available = available[0]+', '+available[1]+', '+available[3];
+                } else available;
+
+                albumHTML += '<p class="caption">Available in: '+available+'</p>';
+                
+                
+                albumHTML += '<div class="clear-fix"></div>';
+
+                albumHTML += '</li>';
+
+            });
+            albumHTML += '</ul>';
+            //add albumHTML into resultList
+            $('#resultList').html(albumHTML);
+            //after finnish searching, enable btn again
+            searchField.prop("disabled",false);
+            submitButton.attr("disabled",false).val("Search");
+        }
+
+        //get data
+        $.getJSON(spotifyAPI, spotifyOptions, displayAlbums);
+
+        
+       
+
+    })
+    
+        
+})
+
+</script>
+
+</head>
+
+<body>
+
+    <div class="brand">Spotify</div>
+
+        <div class="container">
+            <div class="intro-text">
+                <div class="intro-lead-in"><h4>Choose your artist!</h4></div>
+                
+                <form>
+                    <div class="form-group">
+                        <input type="text" id="keyword" class="form-control">
+                        <button type="submit" class="btn btn-default centered" id="searchBtn">Search</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+ 
+
+    <!-- Services Section -->
+    
+    <div class="container">
+        <br>
+        <br>
+        <div class="panel panel-default schedule">
+            <div class="panel-heading text-center">
+                <h1 id="artistName"></h1>
+            </div>
+            <div class="panel-body" id="resultList">
+                
+            </div>
+        </div>
+    </div>
+
+      
+
+     
+   
+  
+
+
+</body>
+</html>
